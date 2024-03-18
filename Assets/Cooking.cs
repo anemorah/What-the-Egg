@@ -27,7 +27,7 @@ public class Cooking : MonoBehaviour
     private bool selectTin;
     private bool selectSpatula;
 
-    private int gameStage;
+    private int gameStage = 1;
     private int score;
 
     public TMP_Text scoreDisplay;
@@ -77,19 +77,27 @@ public class Cooking : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             if (!selectEgg)
+            {
                 selectEgg = true;
+                Debug.Log("Selected egg.");
+            }
             else selectEgg = false;
         }
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             if (!selectTin)
+            {
                 selectTin = true;
+                Debug.Log("Selected tin.");
+            }
             else selectTin = false;
         }
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             if (!selectSpatula)
+            {
                 selectSpatula = true;
+            }
             else selectSpatula = false;
         }
     }
