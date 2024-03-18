@@ -8,8 +8,6 @@ public class Cooking : MonoBehaviour
 {
     private float elapsedTime;
     private float timeLimit = 10f;
-    private float pauseElapsedTime;
-    private float pauseTimeLimit = 2f;
 
     private bool pausing = true;
 
@@ -27,44 +25,41 @@ public class Cooking : MonoBehaviour
     private bool selectTin;
     private bool selectSpatula;
 
-    private int gameStage = 1;
+    private int gameStage;
     private int score;
 
     public TMP_Text scoreDisplay;
+    public TMP_Text timeDisplay;
+
     public AudioSource victorySound;
     public AudioSource errorSound;
     public AudioSource gameOverSound;
 
     void Start()
     {
-        result = GetComponent<SpriteRenderer>().sprite;
+        NextItem();
     }
 
     void Update()
     {
-        if (!pausing)
-        {
-            elapsedTime += Time.deltaTime;
-
-            if (elapsedTime > timeLimit)
-            {
-                errorSound.Play();
-
-                NextItem();
-            }
-        }
-        else
-        {
-            pauseElapsedTime += Time.deltaTime;
-
-            if (pauseElapsedTime > pauseTimeLimit)
-            {
-                NextItem();
-            }
-        }
-
         HandleInput();
-        ScaleImage();
+
+        result = GetComponent<SpriteRenderer>().sprite;
+
+        elapsedTime += Time.deltaTime;
+
+        if (elapsedTime > timeLimit)
+        {
+            Debug.Log("Fail!");
+
+            // errorSound.Play();
+
+            NextItem();
+        }
+
+        PlayItem();
+        ShowTimer();
+        // ScaleImage();
     }
 
     private void StartRound()
@@ -79,26 +74,47 @@ public class Cooking : MonoBehaviour
             if (!selectEgg)
             {
                 selectEgg = true;
-                Debug.Log("Selected egg.");
+
+                egg.GetComponent<SpriteRenderer>().color = Color.red;
             }
-            else selectEgg = false;
+            else
+            {
+                selectEgg = false;
+
+                egg.GetComponent<SpriteRenderer>().color = Color.white;
+            }
         }
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             if (!selectTin)
             {
                 selectTin = true;
-                Debug.Log("Selected tin.");
+
+                tin.GetComponent<SpriteRenderer>().color = Color.red;
+
             }
-            else selectTin = false;
+            else
+            {
+                selectTin = false;
+
+                tin.GetComponent<SpriteRenderer>().color = Color.white;
+
+            }
         }
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             if (!selectSpatula)
             {
                 selectSpatula = true;
+
+                spatula.GetComponent<SpriteRenderer>().color = Color.red;
             }
-            else selectSpatula = false;
+            else
+            {
+                selectSpatula = false;
+
+                spatula.GetComponent<SpriteRenderer>().color = Color.white;
+            }
         }
     }
 
@@ -109,6 +125,13 @@ public class Cooking : MonoBehaviour
             if (selectEgg && selectTin)
             {
                 score += 1;
+
+                Debug.Log("Good job!");
+
+
+                NextItem();
+
+
                 pausing = true;
             }
         }
@@ -117,6 +140,11 @@ public class Cooking : MonoBehaviour
             if (selectEgg && selectSpatula)
             {
                 score += 1;
+
+                Debug.Log("Good job!");
+
+                NextItem();
+
                 pausing = true;
             }
         }
@@ -125,7 +153,13 @@ public class Cooking : MonoBehaviour
             if (selectSpatula && selectTin)
             {
                 score += 1;
+
+                Debug.Log("Good job!");
+
+                NextItem();
+
                 pausing = true;
+
             }
         }
         else if (result == tiramisu)
@@ -133,35 +167,56 @@ public class Cooking : MonoBehaviour
             if (selectEgg && selectTin && selectSpatula)
             {
                 score += 1;
+
+                Debug.Log("Good job!");
+
+
+                NextItem();
+
                 pausing = true;
             }
         }
+
+        UpdateScore();
     }
 
     private void ChangeSprite(Sprite sprite)
     {
-        result = sprite;
+        GetComponent<SpriteRenderer>().sprite = sprite;
     }
 
     private void NextItem()
     {
+        selectEgg = false;
+        selectTin = false;
+        selectSpatula = false;
+
+        egg.GetComponent<SpriteRenderer>().color = Color.white;
+        tin.GetComponent<SpriteRenderer>().color = Color.white;
+        spatula.GetComponent<SpriteRenderer>().color = Color.white;
+
+        Debug.Log("Next item:");
+
         elapsedTime = 0;
-        pauseElapsedTime = 0;
 
         gameStage += 1;
 
         switch (gameStage)
         {
             case 1:
+                Debug.Log("Make a cake.");
                 ChangeSprite(cake);
                 break;
             case 2:
+                Debug.Log("Fry an egg.");
                 ChangeSprite(friedEgg);
                 break;
             case 3:
+                Debug.Log("Oven a lasagna.");
                 ChangeSprite(lasagna);
                 break;
             case 4:
+                Debug.Log("Make tiramisu!");
                 ChangeSprite(tiramisu);
                 break;
             default:
@@ -184,8 +239,8 @@ public class Cooking : MonoBehaviour
         scoreDisplay.text = score.ToString();
     }
 
-    private void GameOverScreen()
+    private void ShowTimer()
     {
-
+        timeDisplay.text = (timeLimit - elapsedTime).ToString();
     }
 }
